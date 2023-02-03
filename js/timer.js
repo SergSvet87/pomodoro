@@ -1,58 +1,72 @@
 import { alarmStop, alarmTimer } from './alarm.js';
 import { changeActiveBtn } from './control.js';
 import { state } from './state.js';
+import { showTodo, updateTodo } from './todo.js';
 import { addZero } from './utils.js';
 
 const timeMinutes = document.querySelector('.time__minutes');
 const timeSeconds = document.querySelector('.time__seconds');
-
-// const addZero = (n) => {
-//   // if (n < 10) {
-//   //   return '0' + n;
-//   // }
-
-//   const newN = n < 10 ? `0${n}` : n;
-
-//   return newN;
-// }
 
 export const showTime = (seconds) => {
   timeMinutes.textContent = addZero(Math.floor(seconds / 60));
   timeSeconds.textContent = addZero(seconds % 60);
 }
 
+const title = document.title;
 
 export const startTimer = () => {
-  state.timeLeft -= 3;
+  const countdown = new Date().getTime() + state.timeLeft * 1000;
 
-  showTime(state.timeLeft)
+  state.timerId = setInterval(() => {
 
-  if (state.timeLeft > 0 && state.isActive) {
-    state.timerId = setTimeout(startTimer, 1000);
-  }
+    state.timeLeft -= 1;
 
-  if (state.timeLeft === 3) {
-    alarmTimer()
-  }
+    showTime(state.timeLeft);
 
-  if (state.timeLeft <= 0) {
-    
-    if (state.status === 'work') {
-      state.activeTodo.pomodoro += 1;
+    document.title = state.timeLeft;
 
-      if (state.activeTodo.pomodoro % state.count) {
-        state.status = 'break';
-      } else {
-        state.status = 'relax';
-      }
-
-    } else {
-      state.status === 'work';
+    if (!(state.timeLeft % 10)) {
+      const now = new Date().getTime();
+      state.timeLeft = Math.floor((countdown - now) / 1000);
     }
 
-    alarmStop();
-    state.timeLeft = state[state.status] * 60;
-    changeActiveBtn(state.status);
-    startTimer();
-  }
+    if (state.timeLeft > 0 && state.isActive) {
+      return;
+    }
+
+    if (state.timeLeft === 3) {
+      alarmTimer()
+    }
+
+    document.title = state.timeLeft;
+
+    if (state.timeLeft <= 0) {
+
+      alarmStop();
+
+      if (state.status === 'work') {
+        state.activeTodo.pomodoro += 1;
+
+        updateTodo(state.activeTodo);
+
+        if (state.activeTodo.pomodoro % state.count) {
+          state.status = 'break';
+        } else {
+          state.status = 'relax';
+        }
+
+      } else {
+        state.status === 'work';
+      }
+
+      state.timeLeft = state[state.status] * 60;
+      changeActiveBtn(state.status);
+      showTodo();
+      startTimer();
+    }
+  }, 1000);
+
+  // if (state.timeLeft > 0 && state.isActive) {
+  //   state.timerId = setTimeout(startTimer, 1000);
+  // }
 }
