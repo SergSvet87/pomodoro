@@ -34,13 +34,14 @@ export const startTimer = () => {
       return;
     }
 
+    document.title = state.timeLeft;
+    clearTimeout(state.timerId);
+
     if (state.timeLeft === 3) {
-      alarmTimer()
+      alarmTimer();
     }
 
-    document.title = state.timeLeft;
-
-    if (state.timeLeft <= 0) {
+    if (state.timeLeft === 0) {
 
       alarmStop();
 
@@ -56,9 +57,8 @@ export const startTimer = () => {
         }
 
       } else {
-        state.status === 'work';
+        state.status = 'work';
       }
-
       state.timeLeft = state[state.status] * 60;
       changeActiveBtn(state.status);
       showTodo();

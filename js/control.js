@@ -29,9 +29,9 @@ export const stop = () => {
 export const initControl = () => {
   btnStart.addEventListener('click', () => {
     if (state.isActive) {
+      clearTimeout(state.timerId);
       state.isActive = false
       btnStart.textContent = 'Старт';
-      clearTimeout(state.timerId);
     } else {
       state.isActive = true;
       btnStart.textContent = 'Пауза';
@@ -47,7 +47,6 @@ export const initControl = () => {
       changeActiveBtn(btnsNavigation[index].dataset.use);
       stop()
     });
-
   }
 
   showTime(state.timeLeft);
