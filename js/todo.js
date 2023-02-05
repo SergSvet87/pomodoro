@@ -130,6 +130,10 @@ const addTodo = (title) => {
 export const updateTodo = (todo) => {
   const todoList = getTodo();
 
+  if (!todoList.length) {
+    return;
+  }
+
   const todoItem = todoList.find(item => item.id === todo.id);
 
   todoItem.title = todo.title;
